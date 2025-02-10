@@ -1870,6 +1870,10 @@ def generate_report(
             # UMAG 소속 처리
             #-------------------------------------------------------------------------
             if one_sosok == "UMAG":
+                if "FLUXUS" in affils:
+                    # 중복 소속이면 UMAG 로직은 건너뛴다
+                    continue
+
                 # 진행률
                 ratio = (i + 1) / len(all_artists)
                 progress_bar.progress(ratio)
