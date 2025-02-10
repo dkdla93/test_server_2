@@ -918,17 +918,13 @@ def section_zero_prepare_song_cost():
             prev_val = prev_remain_dict.get(artist_n,0.0)
 
             # 모든 소속매출 합산
-            total_revenue = 0.0
-            for one_sosok in affils:
-                if one_sosok == "UMAG":
-                    total_revenue += sum_umag_dict.get(artist_n, 0.0)
-                elif one_sosok == "FLUXUS":
-                    fs_val = sum_flux_song_dict.get(artist_n, 0.0)
-                    fy_val = sum_flux_yt_dict.get(artist_n, 0.0)
-                    total_revenue += (fs_val + fy_val)
-                else:
-                    # 알수없는 소속? pass
-                    pass
+        for one_sosok in affils:
+            if one_sosok == "UMAG":
+                total_revenue += sum_umag_dict.get(artist_n, 0.0)
+            elif one_sosok == "FLUXUS":
+                fs_val = sum_flux_song_dict.get(artist_n, 0.0)
+                fy_val = sum_flux_yt_dict.get(artist_n, 0.0)
+                total_revenue += (fs_val + fy_val)
 
             can_deduct = prev_val + curr_val
             actual_deduct = min(total_revenue, can_deduct)
@@ -1839,8 +1835,11 @@ def generate_report(
         affils = artist_sosok_dict[artist]
         for one_sosok in affils:
             if one_sosok == "UMAG":
-                needed_titles.append(f"{one_sosok}_{artist}(세부매출내역)")
-                needed_titles.append(f"{one_sosok}_{artist}(정산서)")
+                if "FLUXUS" in affils:
+                    continue
+                else:
+                    needed_titles.append(f"{one_sosok}_{artist}(세부매출내역)")
+                    needed_titles.append(f"{one_sosok}_{artist}(정산서)")
             elif one_sosok == "FLUXUS":
                 needed_titles.append(f"{one_sosok}_{artist}(세부매출내역)")
                 needed_titles.append(f"{one_sosok}_{artist}(정산서)")
@@ -3105,6 +3104,61 @@ def generate_report(
                 })
 
 
+                # --여기에 '밴딩' 추가--
+                banding_start_row = row_cursor_album + 1     # 헤더 바로 다음 줄
+                banding_end_row   = row_cursor_sum2 - 1      # 합계행 전까지
+                banding_start_col = 1                       # (B열=1)
+                banding_end_col   = 7                       # (마지막=G열=7) 
+
+                if banding_end_row > banding_start_row:
+                    report_requests.append({
+                        "addBanding": {
+                            "bandedRange": {
+                                "range": {
+                                    "sheetId": ws_report_id,  # UMAG 정산서 sheet ID
+                                    "startRowIndex": banding_start_row,
+                                    "endRowIndex": banding_end_row,
+                                    "startColumnIndex": banding_start_col,
+                                    "endColumnIndex": banding_end_col
+                                },
+                                "rowProperties": {
+                                    "firstBandColor": {
+                                        "red": 1.0, "green": 1.0, "blue": 1.0
+                                    },
+                                    "secondBandColor": {
+                                        "red": 0.896, "green": 0.988, "blue": 1
+                                    }
+                                },
+                            }
+                        }
+                    })
+
+                    # 줄무늬 구간 텍스트/정렬/폰트 등
+                    report_requests.append({
+                        "repeatCell": {
+                            "range": {
+                                "sheetId": ws_report_id,
+                                "startRowIndex": banding_start_row,
+                                "endRowIndex": banding_end_row,
+                                "startColumnIndex": banding_start_col,
+                                "endColumnIndex": banding_end_col
+                            },
+                            "cell": {
+                                "userEnteredFormat": {
+                                    "horizontalAlignment": "CENTER",
+                                    "verticalAlignment": "MIDDLE",
+                                    "textFormat": {
+                                        "fontFamily": "Malgun Gothic",
+                                        "fontSize": 10,
+                                        "bold": False
+                                    }
+                                }
+                            },
+                            "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        }
+                    })
+
+
                 # (L-1) 공제 내역 타이틀
                 report_requests.append({
                     "repeatCell": {
@@ -3428,12 +3482,39 @@ def generate_report(
                 # ##########################
                 # (1) FLUXUS 세부매출내역 탭
                 # ##########################
+                
+                # 0) 추가: UMAG 매출 가져오기
+                umag_details = artist_revenue_dict[artist]  
+                umag_details_sorted = sorted(umag_details, key=lambda d: album_sort_key(d["album"]))
+
+                # 1) UMAG 데이터를 "Fluxus YT"와 비슷한 구조로 변환 (album, track_title, revenue 등)
+                umag_in_fluxus_format = []
+                for d in umag_details_sorted:
+                    album_name = d["album"]
+                    # "내용" 칼럼에는 대분류>중분류>서비스명 을 합쳐서
+                    track_title = f"{d['major']}>{d['middle']}>{d['service']}"
+                    rv = d["revenue"]
+                    umag_in_fluxus_format.append({
+                        "album": album_name,
+                        "track_title": track_title,
+                        "track_number": "",
+                        "track_id": "",
+                        "revenue": rv
+                    })
+
+                # 2) 원래 Fluxus가 가져오던 매출
                 ws_fluxus_detail = out_sh.worksheet(f"{one_sosok}_{artist}(세부매출내역)")
                 fluxus_yt_details = fluxus_yt_dict[artist]
                 fluxus_fs_details = fluxus_song_dict[artist]
+
+                # 3) UMAG -> fluxus_yt_details 에 합침
+                fluxus_yt_details.extend(umag_in_fluxus_format)
+
+                # 4) 이제 합쳐진 fluxus_yt_details를 정렬
                 fluxus_yt_details_sorted = sorted(fluxus_yt_details, key=lambda d: album_sort_key(d["album"]))
                 fluxus_fs_details_sorted = sorted(fluxus_fs_details, key=lambda d: album_sort_key(d["album"]))
 
+                # 5) 이후에는 기존처럼 fluxus_yt_details 를 정렬/그룹핑
                 fluxus_detail_matrix = []
                 fluxus_detail_matrix.append(["앨범아티스트","앨범명","트랙 No.","트랙명","트랙 ID","기간","매출 순수익"])
 
@@ -3828,10 +3909,20 @@ def generate_report(
 
                 start_album_data = row_cursor
                 for alb in sorted(fluxus_album_sum.keys(), key=album_sort_key):
-                    amt = fluxus_album_sum[alb]
+                    amt_total = fluxus_album_sum[alb]     # UMAG+YT+SONG 통합
+                    amt_song  = fs_album_sum.get(alb, 0)  # SONG만
+
+                    # 1) 앨범 전체 매출(= 기존 로직)
                     report_fluxus_matrix[row_cursor][1] = alb
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                    report_fluxus_matrix[row_cursor][5] = to_currency(amt)
+                    report_fluxus_matrix[row_cursor][5] = to_currency(amt_total)
+                    row_cursor += 1
+                    
+                    # 2) 국내, 해외 플랫폼(직전달)
+                    report_fluxus_matrix[row_cursor][1] = alb
+                    report_fluxus_matrix[row_cursor][2] = "국내, 해외 플랫폼(직전달)"
+                    report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
+                    report_fluxus_matrix[row_cursor][5] = to_currency(amt_song)
                     row_cursor += 1
 
                 end_album_data = row_cursor  # 데이터 마지막 +1
@@ -3951,8 +4042,22 @@ def generate_report(
                     }
                     check_dict["details_verification"]["세부매출"].append(row_report_item)
 
+                # (3) UMAG 매출 추가
+                for d in umag_in_fluxus_format:
+                    original_val = d["revenue"]
+                    row_report_item = {
+                        "구분": "input_online revenue_umag_integrated",
+                        "아티스트": artist,
+                        "앨범": d["album"],
+                        "서비스명": d["track_title"],
+                        "원본_매출액": original_val,
+                        "정산서_매출액": original_val,  # (실제론 비교 로직 가능)
+                        "match_매출액": True           # 예: 간단히 True 처리
+                    }
+                    check_dict["details_verification"]["세부매출"].append(row_report_item)
 
-                # (2) 공제 내역(곡비,공제금액,공제후잔액)
+
+                # (4) 공제 내역(곡비,공제금액,공제후잔액)
                 #   원본(= input_song cost) 값 vs 보고서 값
                 #   "곡비"는 (prev + curr), "공제금액"=deduct_val, "남은 곡비"=remain_val
                 #   *원본_곡비 = (전월잔액 + 당월발생)
@@ -3983,7 +4088,7 @@ def generate_report(
                 }
                 check_dict["details_verification"]["정산서"].append(row_report_item_3)
 
-                # (3) 4번 수익 배분율
+                # (5) 4번 수익 배분율
                 original_rate = artist_cost_dict[artist]["정산요율"]
                 is_rate_match = almost_equal(original_rate, rate_val)
                 if not is_rate_match:
@@ -4813,6 +4918,60 @@ def generate_report(
                         "fields": "userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
+
+
+                # --여기에 '밴딩' 추가--
+                banding_start_row = row_cursor_album + 1
+                banding_end_row = row_cursor_sum2 - 1
+                banding_start_col = 1
+                banding_end_col = 6  # Fluxus는 G열이 index=6까지
+
+                if banding_end_row > banding_start_row:
+                    report_fluxus_requests.append({
+                        "addBanding": {
+                            "bandedRange": {
+                                "range": {
+                                    "sheetId": ws_fluxus_report_id,
+                                    "startRowIndex": banding_start_row,
+                                    "endRowIndex": banding_end_row,
+                                    "startColumnIndex": banding_start_col,
+                                    "endColumnIndex": banding_end_col
+                                },
+                                "rowProperties": {
+                                    "firstBandColor": {
+                                        "red": 1.0, "green": 1.0, "blue": 1.0
+                                    },
+                                    "secondBandColor": {
+                                        "red": 0.896, "green": 0.988, "blue": 1
+                                    }
+                                }
+                            }
+                        }
+                    })
+
+                    report_fluxus_requests.append({
+                        "repeatCell": {
+                            "range": {
+                                "sheetId": ws_fluxus_report_id,
+                                "startRowIndex": banding_start_row,
+                                "endRowIndex": banding_end_row,
+                                "startColumnIndex": banding_start_col,
+                                "endColumnIndex": banding_end_col
+                            },
+                            "cell": {
+                                "userEnteredFormat": {
+                                    "horizontalAlignment": "CENTER",
+                                    "verticalAlignment": "MIDDLE",
+                                    "textFormat": {
+                                        "fontFamily": "Malgun Gothic",
+                                        "fontSize": 10,
+                                        "bold": False
+                                    }
+                                }
+                            },
+                            "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        }
+                    })
 
 
                 # (L-1) 공제 내역 타이틀
