@@ -3925,7 +3925,7 @@ def generate_report(
                     
                     # 2) 국내, 해외 플랫폼(직전달)
                     report_fluxus_matrix[row_cursor][1] = alb
-                    report_fluxus_matrix[row_cursor][2] = "국내, 해외 플랫폼(직전달)"
+                    report_fluxus_matrix[row_cursor][2] = f"국내, 해외 플랫폼({int(month_val)-1}월)"
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
                     report_fluxus_matrix[row_cursor][5] = to_currency(amt_song)
                     row_cursor += 1
