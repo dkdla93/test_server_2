@@ -918,13 +918,14 @@ def section_zero_prepare_song_cost():
             prev_val = prev_remain_dict.get(artist_n,0.0)
 
             # 모든 소속매출 합산
-        for one_sosok in affils:
-            if one_sosok == "UMAG":
-                total_revenue += sum_umag_dict.get(artist_n, 0.0)
-            elif one_sosok == "FLUXUS":
-                fs_val = sum_flux_song_dict.get(artist_n, 0.0)
-                fy_val = sum_flux_yt_dict.get(artist_n, 0.0)
-                total_revenue += (fs_val + fy_val)
+            total_revenue = 0.0
+            for one_sosok in affils:
+                if one_sosok == "UMAG":
+                    total_revenue += sum_umag_dict.get(artist_n, 0.0)
+                elif one_sosok == "FLUXUS":
+                    fs_val = sum_flux_song_dict.get(artist_n, 0.0)
+                    fy_val = sum_flux_yt_dict.get(artist_n, 0.0)
+                    total_revenue += (fs_val + fy_val)
 
             can_deduct = prev_val + curr_val
             actual_deduct = min(total_revenue, can_deduct)
