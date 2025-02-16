@@ -1399,63 +1399,27 @@ def section_three_upload_and_split_excel():
     # (4) “어떤 아티스트”에 해당하는 탭들이 있는지 찾기
     #     예: 'UMAG_홍길동(정산서)', 'UMAG_홍길동(세부매출내역)' 형태라고 가정
     from collections import defaultdict
-    all_artists_sheets = defaultdict(
-        lambda: {
-            "umag_report": None,
-            "umag_detail": None,
-            "fluxus_report": None,
-            "fluxus_detail": None
-        }
-    )
+    all_artists_sheets = defaultdict(lambda: {"report": None, "detail": None})
 
     for sn in sheet_names:
+        # 1) "(정산서)" 또는 "(세부매출내역)"가 없으면 스킵
         if not ("(정산서)" in sn or "(세부매출내역)" in sn):
-            # 스킵
             continue
 
-        # 2) 소속 파싱
-        affiliate = None
-        artist_name = None
+        # 2) 뒤쪽으로 어떤 타입인지 확인
+        if sn.endswith("(정산서)"):
+            # (정산서) 5글자
+            artist_name = sn[:-5].strip()   # e.g. "홍길동(정산서)" → "홍길동"
+            all_artists_sheets[artist_name]["report"] = sn
 
-        # (A) UMAG_ 로 시작하면 affiliate="UMAG"
-        if sn.startswith("UMAG_"):
-            affiliate = "umag"
-            # "UMAG_홍길동(정산서)" → "홍길동(정산서)"
-            tmp = sn[len("UMAG_"):]
-        elif sn.startswith("FLUXUS_"):
-            affiliate = "fluxus"
-            tmp = sn[len("FLUXUS_"):]
-        else:
-            # 혹시 소속없는 시트는 pass
-            continue
-
-        # (B) tmp가 예: "홍길동(정산서)" or "홍길동(세부매출내역)"
-        if tmp.endswith("(정산서)"):
-            # artist_name = tmp[:-5].strip() → (정산서) 5글자
-            artist_name = tmp[:-5].strip()
-            is_report = True
-        elif tmp.endswith("(세부매출내역)"):
-            artist_name = tmp[:-8].strip()
-            is_report = False
-        else:
-            continue
+        elif sn.endswith("(세부매출내역)"):
+            # (세부매출내역) 8글자
+            artist_name = sn[:-8].strip()
+            all_artists_sheets[artist_name]["detail"] = sn
 
         # 3) all_artists_sheets에 저장
         if not artist_name:
             continue
-
-        # 이제 artist_name을 최종 dict의 key로
-        if affiliate == "umag":
-            if is_report:
-                all_artists_sheets[artist_name]["umag_report"] = sn
-            else:
-                all_artists_sheets[artist_name]["umag_detail"] = sn
-        elif affiliate == "fluxus":
-            if is_report:
-                all_artists_sheets[artist_name]["fluxus_report"] = sn
-            else:
-                all_artists_sheets[artist_name]["fluxus_detail"] = sn
-
 
     all_artist_list = sorted(all_artists_sheets.keys())
     total_artists = len(all_artist_list)
@@ -1469,17 +1433,13 @@ def section_three_upload_and_split_excel():
             progress_bar.progress(ratio)
             progress_text.info(f"{int(ratio*100)}% - '{artist}' 처리 중...")
 
+            keep_sheets = []
             sheet_dict = all_artists_sheets[artist]
 
-            # 이 아티스트가 가지는 (최대 4개) 탭
-            # None이 아닌 것만 수집
-            keep_sheets = []
-            for sname in [sheet_dict["umag_report"],
-                          sheet_dict["umag_detail"],
-                          sheet_dict["fluxus_report"],
-                          sheet_dict["fluxus_detail"]]:
-                if sname is not None:
-                    keep_sheets.append(sname)
+            if sheet_dict["report"]:
+                keep_sheets.append(sheet_dict["report"])
+            if sheet_dict["detail"]:
+                keep_sheets.append(sheet_dict["detail"])
 
             if not keep_sheets:
                 # 이 아티스트는 시트가 하나도 없으면 스킵
