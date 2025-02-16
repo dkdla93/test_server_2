@@ -1878,7 +1878,7 @@ def generate_report(
                 # ##################################
                 # UMAG 세부매출내역 탭 (batchUpdate 방식)
                 # ##################################
-                ws_detail = out_sh.worksheet(f"{one_sosok}_{artist}(세부매출내역)")
+                ws_detail = out_sh.worksheet(f"{artist}(세부매출내역)")
                 details = artist_revenue_dict[artist]
                 details_sorted = sorted(details, key=lambda d: album_sort_key(d["album"]))
 
@@ -2104,7 +2104,7 @@ def generate_report(
                 # ##################################
                 # UMAG 정산서 탭 (batchUpdate 방식)
                 # ##################################
-                ws_report = out_sh.worksheet(f"{one_sosok}_{artist}(정산서)")
+                ws_report = out_sh.worksheet(f"{artist}(정산서)")
                 ws_report_id = ws_report.id
 
                 # 매출 합
@@ -3565,7 +3565,7 @@ def generate_report(
                     })
 
                 # 2) 원래 Fluxus가 가져오던 매출
-                ws_fluxus_detail = out_sh.worksheet(f"{one_sosok}_{artist}(세부매출내역)")
+                ws_fluxus_detail = out_sh.worksheet(f"{artist}(세부매출내역)")
                 fluxus_yt_details = fluxus_yt_dict[artist]
                 fluxus_fs_details = fluxus_song_dict[artist]
 
@@ -3849,7 +3849,7 @@ def generate_report(
                 # ################################
                 # FLUXUS 정산서 탭 (batchUpdate 방식)
                 # ################################
-                ws_fluxus_report = out_sh.worksheet(f"{one_sosok}_{artist}(정산서)")
+                ws_fluxus_report = out_sh.worksheet(f"{artist}(정산서)")
                 ws_fluxus_report_id = ws_fluxus_report.id
 
                 # 매출 합
