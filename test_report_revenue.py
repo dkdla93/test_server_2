@@ -2197,7 +2197,7 @@ def generate_report(
 
                 for alb in sorted(album_sum.keys(), key=album_sort_key):
                     amt = album_sum[alb]
-                    report_matrix[row_cursor][1] = round(alb)
+                    report_matrix[row_cursor][1] = alb
                     report_matrix[row_cursor][5] = f"{year_val}년 {month_val}월"
                     report_matrix[row_cursor][6] = round(amt)
                     row_cursor += 1
@@ -3948,7 +3948,7 @@ def generate_report(
                     fs_sum_for_this_album = fs_album_sum[alb]  # 위에서 만든 fs_album_sum 딕셔너리
 
                     # 한 줄 추가
-                    report_fluxus_matrix[row_cursor][1] = round(alb)
+                    report_fluxus_matrix[row_cursor][1] = alb
                     report_fluxus_matrix[row_cursor][2] = f"국내, 해외 플랫폼({int(month_val)-1}월)"
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
                     report_fluxus_matrix[row_cursor][5] = round(fs_sum_for_this_album)
@@ -3983,13 +3983,13 @@ def generate_report(
                     amt_song  = fs_album_sum.get(alb, 0)  # SONG만
 
                     # 1) 앨범 전체 매출(= 기존 로직)
-                    report_fluxus_matrix[row_cursor][1] = round(alb)
+                    report_fluxus_matrix[row_cursor][1] = alb
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
                     report_fluxus_matrix[row_cursor][5] = round(amt_total)
                     row_cursor += 1
                     
                     # 2) 국내, 해외 플랫폼(직전달)
-                    report_fluxus_matrix[row_cursor][1] = round(alb)
+                    report_fluxus_matrix[row_cursor][1] = alb
                     report_fluxus_matrix[row_cursor][2] = f"국내, 해외 플랫폼({int(month_val)-1}월)"
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
                     report_fluxus_matrix[row_cursor][5] = round(amt_song)
