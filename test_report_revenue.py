@@ -1379,107 +1379,124 @@ def section_three_upload_and_split_excel():
     if uploaded_file is None:
         return
 
-    # (3) 업로드된 엑셀 전체 로딩
-    progress_bar = st.progress(0.0)
-    progress_text = st.empty()
+    # 2) "아티스트별 XLSX 만들기" 버튼을 만듦
+    if st.button("아티스트별 XLSX 파일 생성하기"):
+        # 여기에서 ZIP 생성
+        try:
+            wb_all = openpyxl.load_workbook(io.BytesIO(uploaded_file.read()))
+        except Exception as e:
+            st.error(f"엑셀 파일을 읽는 중 오류 발생: {e}")
+            return
 
-    original_file_data = uploaded_file.read()
-    try:
-        # 전체 워크북 (구글시트에서 다운로드한 그대로)
-        wb_all = openpyxl.load_workbook(io.BytesIO(original_file_data))
-    except Exception as e:
-        st.error(f"엑셀 파일을 읽는 중 오류 발생: {e}")
-        return
+        # (3) 업로드된 엑셀 전체 로딩
+        progress_bar = st.progress(0.0)
+        progress_text = st.empty()
 
-    sheet_names = wb_all.sheetnames
-    if not sheet_names:
-        st.warning("업로드된 엑셀 파일에 시트가 없습니다.")
-        return
+        original_file_data = uploaded_file.read()
+        try:
+            # 전체 워크북 (구글시트에서 다운로드한 그대로)
+            wb_all = openpyxl.load_workbook(io.BytesIO(original_file_data))
+        except Exception as e:
+            st.error(f"엑셀 파일을 읽는 중 오류 발생: {e}")
+            return
 
-    # (4) “어떤 아티스트”에 해당하는 탭들이 있는지 찾기
-    #     예: 'UMAG_홍길동(정산서)', 'UMAG_홍길동(세부매출내역)' 형태라고 가정
-    from collections import defaultdict
-    all_artists_sheets = defaultdict(lambda: {"report": None, "detail": None})
+        sheet_names = wb_all.sheetnames
+        if not sheet_names:
+            st.warning("업로드된 엑셀 파일에 시트가 없습니다.")
+            return
 
-    for sn in sheet_names:
-        # 1) "(정산서)" 또는 "(세부매출내역)"가 없으면 스킵
-        if not ("(정산서)" in sn or "(세부매출내역)" in sn):
-            continue
+        # (4) “어떤 아티스트”에 해당하는 탭들이 있는지 찾기
+        #     예: 'UMAG_홍길동(정산서)', 'UMAG_홍길동(세부매출내역)' 형태라고 가정
+        from collections import defaultdict
+        all_artists_sheets = defaultdict(lambda: {"report": None, "detail": None})
 
-        # 2) 뒤쪽으로 어떤 타입인지 확인
-        if sn.endswith("(정산서)"):
-            # (정산서) 5글자
-            artist_name = sn[:-5].strip()   # e.g. "홍길동(정산서)" → "홍길동"
-            all_artists_sheets[artist_name]["report"] = sn
-
-        elif sn.endswith("(세부매출내역)"):
-            # (세부매출내역) 8글자
-            artist_name = sn[:-8].strip()
-            all_artists_sheets[artist_name]["detail"] = sn
-
-        # 3) all_artists_sheets에 저장
-        if not artist_name:
-            continue
-
-    all_artist_list = sorted(all_artists_sheets.keys())
-    total_artists = len(all_artist_list)
-
-
-    # 5) ZIP으로 묶기
-    zip_buf = io.BytesIO()
-    with zipfile.ZipFile(zip_buf, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for i, artist in enumerate(all_artist_list):
-            ratio = (i + 1) / total_artists
-            progress_bar.progress(ratio)
-            progress_text.info(f"{int(ratio*100)}% - '{artist}' 처리 중...")
-
-            keep_sheets = []
-            sheet_dict = all_artists_sheets[artist]
-
-            if sheet_dict["report"]:
-                keep_sheets.append(sheet_dict["report"])
-            if sheet_dict["detail"]:
-                keep_sheets.append(sheet_dict["detail"])
-
-            if not keep_sheets:
-                # 이 아티스트는 시트가 하나도 없으면 스킵
+        for sn in sheet_names:
+            # 1) "(정산서)" 또는 "(세부매출내역)"가 없으면 스킵
+            if not ("(정산서)" in sn or "(세부매출내역)" in sn):
                 continue
 
-            # (A) 원본 워크북 복사
-            temp_wb = openpyxl.load_workbook(io.BytesIO(original_file_data))
+            # 2) 뒤쪽으로 어떤 타입인지 확인
+            if sn.endswith("(정산서)"):
+                # (정산서) 5글자
+                artist_name = sn[:-5].strip()   # e.g. "홍길동(정산서)" → "홍길동"
+                all_artists_sheets[artist_name]["report"] = sn
 
-            # (B) 필요 시트(keep_sheets)만 남기고 전부 제거
-            for sname in temp_wb.sheetnames:
-                if sname not in keep_sheets:
-                    ws_del = temp_wb[sname]
-                    temp_wb.remove(ws_del)
+            elif sn.endswith("(세부매출내역)"):
+                # (세부매출내역) 8글자
+                artist_name = sn[:-8].strip()
+                all_artists_sheets[artist_name]["detail"] = sn
 
-            # (C) 저장
-            single_buf = io.BytesIO()
-            temp_wb.save(single_buf)
-            single_buf.seek(0)
+            # 3) all_artists_sheets에 저장
+            if not artist_name:
+                continue
 
-            current_ym = st.session_state.get("ym", "000000")
-            safe_artist = artist.replace("/", "_").replace("\\", "_")
-            # 예: "홍길동_정산보고서_202501.xlsx"
-            filename_xlsx = f"{safe_artist}_정산보고서.xlsx"
+        all_artist_list = sorted(all_artists_sheets.keys())
+        total_artists = len(all_artist_list)
 
-            zf.writestr(filename_xlsx, single_buf.getvalue())
 
-    zip_buf.seek(0)
-    progress_text.success("모든 아티스트 처리 완료! ZIP 다운로드 가능")
+        # 5) ZIP으로 묶기
+        zip_buf = io.BytesIO()
+        with zipfile.ZipFile(zip_buf, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+            for i, artist in enumerate(all_artist_list):
+                ratio = (i + 1) / total_artists
+                progress_bar.progress(ratio)
+                progress_text.info(f"{int(ratio*100)}% - '{artist}' 처리 중...")
 
-    now_str = datetime.datetime.now().strftime("%Y%m%d")  # 예: '20250218'
+                keep_sheets = []
+                sheet_dict = all_artists_sheets[artist]
 
-    zip_filename = f"report_revenue_{now_str}.zip"
+                if sheet_dict["report"]:
+                    keep_sheets.append(sheet_dict["report"])
+                if sheet_dict["detail"]:
+                    keep_sheets.append(sheet_dict["detail"])
 
-    st.download_button(
-        label="ZIP 다운로드",
-        data=zip_buf.getvalue(),
-        file_name=zip_filename,   # ★ 여기를 변경
-        mime="application/zip"
-    )
+                if not keep_sheets:
+                    # 이 아티스트는 시트가 하나도 없으면 스킵
+                    continue
 
+                # (A) 원본 워크북 복사
+                temp_wb = openpyxl.load_workbook(io.BytesIO(original_file_data))
+
+                # (B) 필요 시트(keep_sheets)만 남기고 전부 제거
+                for sname in temp_wb.sheetnames:
+                    if sname not in keep_sheets:
+                        ws_del = temp_wb[sname]
+                        temp_wb.remove(ws_del)
+
+                # (C) 저장
+                single_buf = io.BytesIO()
+                temp_wb.save(single_buf)
+                single_buf.seek(0)
+
+                current_ym = st.session_state.get("ym", "000000")
+                safe_artist = artist.replace("/", "_").replace("\\", "_")
+                # 예: "홍길동_정산보고서_202501.xlsx"
+                filename_xlsx = f"{safe_artist}_정산보고서.xlsx"
+
+                zf.writestr(filename_xlsx, single_buf.getvalue())
+
+        zip_buf.seek(0)
+        progress_text.success("모든 아티스트 처리 완료! ZIP 다운로드 가능")
+
+        now_str = datetime.datetime.now().strftime("%Y%m%d")  # 예: '20250218'
+
+        zip_filename = f"report_revenue_{now_str}.zip"
+
+        st.download_button(
+            label="ZIP 다운로드",
+            data=zip_buf.getvalue(),
+            file_name=zip_filename,   # ★ 여기를 변경
+            mime="application/zip"
+        )
+
+    # 4) 만약 session_state에 zip 데이터가 있으면, download_button 표시
+    if "xlsx_zip_data" in st.session_state:
+        st.download_button(
+            label="ZIP 다운로드",
+            data=st.session_state["xlsx_zip_data"],
+            file_name="report_revenue_20250218.zip",  # 날짜 등 원하는 값
+            mime="application/zip"
+        )
 
 
 # ========== [4] 핵심 로직: generate_report =============
@@ -4660,8 +4677,8 @@ def generate_report(
                             "sheetId": ws_fluxus_report_id,
                             "startRowIndex": 14,
                             "endRowIndex": row_cursor_sum1,
-                            "startColumnIndex": 6,
-                            "endColumnIndex": 7
+                            "startColumnIndex": 5,
+                            "endColumnIndex": 6
                         },
                         "cell": {
                             "userEnteredFormat": {
