@@ -2228,7 +2228,7 @@ def generate_report(
                 alb_list = sorted(album_sum.keys(), key=album_sort_key)
                 alb_str = ", ".join(alb_list) if alb_list else "(앨범 없음)"
 
-                report_matrix[row_cursor][1] = round(alb_str)
+                report_matrix[row_cursor][1] = alb_str
                 # (중요) 여기서 "곡비" = prev_val + curr_val
                 report_matrix[row_cursor][2] = round(song_cost_for_report)
                 # 공제금액
@@ -2253,7 +2253,7 @@ def generate_report(
                 report_matrix[row_cursor][6] = "적용 금액"
                 row_cursor += 1
 
-                report_matrix[row_cursor][1] = round(alb_str)
+                report_matrix[row_cursor][1] = alb_str
                 report_matrix[row_cursor][2] = "수익 배분율"
                 report_matrix[row_cursor][3] = f"{int(rate_val)}%"
                 report_matrix[row_cursor][6] = round(final_amount)
@@ -4024,7 +4024,7 @@ def generate_report(
                 alb_list = sorted(fluxus_album_sum.keys(), key=album_sort_key)
                 alb_str = ", ".join(alb_list) if alb_list else "(앨범 없음)"
 
-                report_fluxus_matrix[row_cursor][1] = round(alb_str)
+                report_fluxus_matrix[row_cursor][1] = alb_str
                 # (중요) 여기서 "곡비" = prev_val + curr_val
                 report_fluxus_matrix[row_cursor][2] = round(song_cost_for_report)
                 # 공제금액
@@ -4049,7 +4049,7 @@ def generate_report(
                 report_fluxus_matrix[row_cursor][5] = "적용 금액"
                 row_cursor += 1
 
-                report_fluxus_matrix[row_cursor][1] = round(alb_str)
+                report_fluxus_matrix[row_cursor][1] = alb_str
                 report_fluxus_matrix[row_cursor][2] = "수익 배분율"
                 report_fluxus_matrix[row_cursor][3] = f"{int(rate_val)}%"
                 report_fluxus_matrix[row_cursor][5] = round(final_amount)
