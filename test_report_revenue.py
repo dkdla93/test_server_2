@@ -491,8 +491,7 @@ def album_sort_key(album_name: str):
     return (0 if is_korean_string(album_name) else 1, album_name)
 
 def to_currency(num):
-    # 반올림 처리로 변경하고 숫자 그대로 반환
-    return str(round(num))
+    return f"₩{format(int(round(num)), ',')}"
 
 def update_next_month_tab(song_cost_sh, ym: str):
     """
@@ -896,7 +895,7 @@ def section_zero_prepare_song_cost():
             sum_flux_yt_dict[a_fy] += val_fy
 
         # ---------------------------------------
-        # [중요] 2개 이상 소속도 "모두" 매출 더해서 actual_deduct 산출
+        # [중요] 2개 이상 소속도 “모두” 매출 더해서 actual_deduct 산출
         # ---------------------------------------
         updated_vals_for_def = []
 
@@ -1151,7 +1150,7 @@ def section_zero_prepare_song_cost():
                 st.error("원본 vs 처리 결과에 차이가 있습니다. 상세탭에서 상세 누락 행을 확인해 주세요.")
 
         with tab_missing:
-            # 여기에서 UMAG / Fluxus Song / Fluxus YT 'missing_rows' 표
+            # 여기에서 UMAG / Fluxus Song / Fluxus YT ‘missing_rows’ 표
             if diff_umag_row!=0 or diff_flux_song!=0 or diff_flux_yt!=0:
                 st.warning(f"매출 데이터 행개수 차이 발생!")
                 st.warning(f"UMAG: {diff_umag_row}개    /   FLUXUS_SONG: {diff_flux_song}개    /   FLUXUS_YT: {diff_flux_yt}개")
@@ -1334,10 +1333,11 @@ def section_two_sheet_link_and_verification():
 def section_three_upload_and_split_excel():
     """
     1) 보고서 구글시트에서 '파일→다운로드→Microsoft Excel(.xlsx)'로 받은 파일을 업로드
-    2) 업로드된 전체 워크북에서, 각 아티스트별 '정산서' 탭 + '세부매출내역' 탭만 남기고
+    2) 업로드된 전체 워크북에서, 각 아티스트별 ‘정산서‘ 탭 + ‘세부매출내역’ 탭만 남기고
        나머지 시트를 제거한 뒤, 해당 워크북을 ZIP으로 묶어 다운로드.
     3) 이 방식으로 하면 구글시트에서 이미 적용된 서식이 그대로 보존됩니다.
     """
+
     st.subheader("3) 엑셀 업로드 후, [아티스트별] XLSX (정산서+세부매출내역) 생성")
 
     # 가이드를 접을 수 있게 만듭니다.
@@ -1345,13 +1345,9 @@ def section_three_upload_and_split_excel():
         st.markdown(
             """
             [사용안내]
-            1. 구글시트 파일을 '엑셀(.xlsx)'로 다운로드 받습니다.
-               - 파일 → 다운로드 → Microsoft Excel (.xlsx)
+            1. 생성된 구글시트 파일을 '엑셀(.xlsx)'로 다운로드 받습니다.
             2. 본 파일을 업로드하면, 아티스트별로 정산서/세부매출내역 탭만 포함된 엑셀 파일이 생성됩니다.
             3. 생성된 엑셀을 하나로 묶은 ZIP 파일을 다운로드하면, 아티스트별 보고서를 개별 확인할 수 있습니다.
-
-            * 이 기능은 다른 섹션과 독립적으로 실행할 수 있습니다.
-            * 정산서와 세부매출내역 탭이 포함된 엑셀 파일이라면 언제든 사용 가능합니다.
             """
         )
 
@@ -1377,7 +1373,7 @@ def section_three_upload_and_split_excel():
         st.warning("업로드된 엑셀 파일에 시트가 없습니다.")
         return
 
-    # (4) "어떤 아티스트"에 해당하는 탭들이 있는지 찾기
+    # (4) “어떤 아티스트”에 해당하는 탭들이 있는지 찾기
     #     예: 'UMAG_홍길동(정산서)', 'UMAG_홍길동(세부매출내역)' 형태라고 가정
     from collections import defaultdict
     all_artists_sheets = defaultdict(
@@ -1510,11 +1506,15 @@ def generate_report(
     artist_placeholder
 ):
     """
-    실제 정산서 생성
+    [요약]
+    1) input_song cost / input_online revenue 시트에서 해당 ym 데이터를 읽어옴
+    2) 아티스트별 매출 및 곡비(전월+당월 발생액, 당월차감 등) 정보를 합산
+    3) 구글 스프레드시트 형태의 'output_report_YYYYMM'을 생성하여
+       - 각 아티스트별 (1) 세부매출내역 탭, (2) 정산서 탭 생성
+       - '정산서' 탭 내 '3. 공제 내역' 칼럼 중 '곡비'를 (전월 잔액 + 당월 발생액)으로 표기
+    4) 최종 검증 정보를 check_dict에 누적
+    5) 작업 완료 후 out_file_id(생성된 구글시트 ID) 반환
     """
-    # 요청 리스트 초기화
-    report_requests = []
-    fluxus_report_requests = []
 
     folder_id = st.secrets["google_service_account_a"]["folder_id"]
 
@@ -1835,11 +1835,11 @@ def generate_report(
                 if "FLUXUS" in affils:
                     continue
                 else:
-                    needed_titles.append(f"{one_sosok}_{artist}(세부매출내역)")
-                    needed_titles.append(f"{one_sosok}_{artist}(정산서)")
+                    needed_titles.append(f"{artist}(정산서)")
+                    needed_titles.append(f"{artist}(세부매출내역)")
             elif one_sosok == "FLUXUS":
-                needed_titles.append(f"{one_sosok}_{artist}(세부매출내역)")
-                needed_titles.append(f"{one_sosok}_{artist}(정산서)")
+                needed_titles.append(f"{artist}(정산서)")
+                needed_titles.append(f"{artist}(세부매출내역)")
             else:
                 print(f"unknown 소속: {one_sosok}")
     batch_add_sheets(out_file_id, sheet_svc, needed_titles)
@@ -1896,11 +1896,11 @@ def generate_report(
                         d["middle"],
                         d["service"],
                         f"{year_val}년 {month_val}월",
-                        to_currency(rv)
+                        rv
                     ])
 
                 # 합계
-                detail_matrix.append(["합계","","","","","", to_currency(total_det)])
+                detail_matrix.append(["합계","","","","","", total_det])
                 row_cursor_detail_end = len(detail_matrix)
 
                 # 시트 업데이트
@@ -2037,6 +2037,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "RIGHT",
                                 "textFormat": {"bold": True}
                             }
@@ -2056,6 +2060,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "RIGHT"
                             }
                         },
@@ -2122,7 +2130,8 @@ def generate_report(
                 # (C) 정산율 / 최종 정산금액
                 rate_val = artist_cost_dict[artist]["정산요율"]
                 공제적용후 = sum_2 - deduct_val
-                final_amount = 공제적용후 * (rate_val / 100.0)
+                final_amount = round(공제적용후 * (rate_val / 100.0))
+
                 
 
                 # --------------------------------------
@@ -2164,13 +2173,13 @@ def generate_report(
                     report_matrix[row_cursor][3] = d["middle"]
                     report_matrix[row_cursor][4] = d["service"]
                     report_matrix[row_cursor][5] = f"{year_val}년 {month_val}월"
-                    report_matrix[row_cursor][6] = to_currency(rv)
+                    report_matrix[row_cursor][6] = rv
                     row_cursor += 1
 
                 row_cursor += 2
                 # 합계
                 report_matrix[row_cursor-1][1] = "합계"
-                report_matrix[row_cursor-1][6] = to_currency(sum_1)
+                report_matrix[row_cursor-1][6] = sum_1
                 row_cursor_sum1 = row_cursor
                 row_cursor += 1
 
@@ -2190,12 +2199,12 @@ def generate_report(
                     amt = album_sum[alb]
                     report_matrix[row_cursor][1] = alb
                     report_matrix[row_cursor][5] = f"{year_val}년 {month_val}월"
-                    report_matrix[row_cursor][6] = to_currency(amt)
+                    report_matrix[row_cursor][6] = amt
                     row_cursor += 1
 
                 row_cursor += 1
                 report_matrix[row_cursor-1][1] = "합계"
-                report_matrix[row_cursor-1][6] = to_currency(sum_2)
+                report_matrix[row_cursor-1][6] = sum_2
                 row_cursor_sum2 = row_cursor
                 row_cursor += 1
 
@@ -2221,13 +2230,13 @@ def generate_report(
 
                 report_matrix[row_cursor][1] = alb_str
                 # (중요) 여기서 "곡비" = prev_val + curr_val
-                report_matrix[row_cursor][2] = to_currency(song_cost_for_report)
+                report_matrix[row_cursor][2] = song_cost_for_report
                 # 공제금액
-                report_matrix[row_cursor][3] = to_currency(deduct_val)
+                report_matrix[row_cursor][3] = deduct_val
                 # 공제 후 남은 곡비
-                report_matrix[row_cursor][5] = to_currency(remain_val)
+                report_matrix[row_cursor][5] = remain_val
                 # 공제 적용 금액 (매출 - 공제금액)
-                report_matrix[row_cursor][6] = to_currency(sum_2 - deduct_val)
+                report_matrix[row_cursor][6] = sum_2 - deduct_val
                 row_cursor += 2
                 row_cursor_sum3 = row_cursor
 
@@ -2247,11 +2256,11 @@ def generate_report(
                 report_matrix[row_cursor][1] = alb_str
                 report_matrix[row_cursor][2] = "수익 배분율"
                 report_matrix[row_cursor][3] = f"{int(rate_val)}%"
-                report_matrix[row_cursor][6] = to_currency(final_amount)
+                report_matrix[row_cursor][6] = final_amount
                 row_cursor += 1
 
                 report_matrix[row_cursor][1] = "총 정산금액"
-                report_matrix[row_cursor][6] = to_currency(final_amount)
+                report_matrix[row_cursor][6] = final_amount
                 row_cursor_sum4 = row_cursor
                 row_cursor += 2
 
@@ -2261,60 +2270,6 @@ def generate_report(
                 # 시트에 실제 업로드
                 ws_report.update(range_name="A1", values=report_matrix)
                 time.sleep(1)
-
-                # 숫자 형식으로 변경할 범위들 정의
-                number_format_ranges = [
-                    # 1. 음원 서비스별 정산내역 - 매출액
-                    {"startRow": header_row_1 + 1, "endRow": row_cursor_sum1 - 1, "col": 6},
-                    # 2. 앨범별 정산내역 - 매출액
-                    {"startRow": row_cursor_album + 1, "endRow": row_cursor_sum2 - 1, "col": 6},
-                    # 3. 공제 내역 - 곡비, 공제금액, 공제후잔액, 공제적용금액
-                    {"startRow": row_cursor_deduction + 1, "endRow": row_cursor_sum3 - 2, "cols": [2,3,5,6]},
-                    # 4. 수익 배분 - 적용금액
-                    {"startRow": row_cursor_rate + 1, "endRow": row_cursor_sum4, "col": 6}
-                ]
-
-                # 숫자 형식 변경 요청 추가
-                for range_info in number_format_ranges:
-                    if "col" in range_info:
-                        # 단일 열인 경우
-                        report_requests.append({
-                            "repeatCell": {
-                                "range": {
-                                    "sheetId": ws_report_id,
-                                    "startRowIndex": range_info["startRow"] - 1,
-                                    "endRowIndex": range_info["endRow"],
-                                    "startColumnIndex": range_info["col"] - 1,
-                                    "endColumnIndex": range_info["col"]
-                                },
-                                "cell": {
-                                    "userEnteredFormat": {
-                                        "numberFormat": {"type": "NUMBER", "pattern": "#,##0"}
-                                    }
-                                },
-                                "fields": "userEnteredFormat.numberFormat"
-                            }
-                        })
-                    else:
-                        # 여러 열인 경우
-                        for col in range_info["cols"]:
-                            report_requests.append({
-                                "repeatCell": {
-                                    "range": {
-                                        "sheetId": ws_report_id,
-                                        "startRowIndex": range_info["startRow"] - 1,
-                                        "endRowIndex": range_info["endRow"],
-                                        "startColumnIndex": col - 1,
-                                        "endColumnIndex": col
-                                    },
-                                    "cell": {
-                                        "userEnteredFormat": {
-                                            "numberFormat": {"type": "NUMBER", "pattern": "#,##0"}
-                                        }
-                                    },
-                                    "fields": "userEnteredFormat.numberFormat"
-                                }
-                            })
 
                 # ------------------------------------
                 # (검증) check_dict에 비교결과 반영
@@ -2874,6 +2829,34 @@ def generate_report(
                         "fields": "userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
+                # (J-2-2) "음원 서비스별" 정산내역 표 본문
+                report_requests.append({
+                    "repeatCell": {
+                        "range": {
+                            "sheetId": ws_report_id,
+                            "startRowIndex": 14,
+                            "endRowIndex": row_cursor_sum1,
+                            "startColumnIndex": 6,
+                            "endColumnIndex": 7
+                        },
+                        "cell": {
+                            "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
+                                "horizontalAlignment": "CENTER",
+                                "verticalAlignment": "MIDDLE",
+                                "textFormat": {
+                                    "fontFamily": "Malgun Gothic",
+                                    "fontSize": 10,
+                                    "bold": False
+                                }
+                            }
+                        },
+                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                    }
+                })
                 # (J-3) 합계행 전 병합
                 report_requests.append({
                     "mergeCells": {
@@ -3060,6 +3043,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -3084,6 +3071,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -3273,6 +3264,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -3297,6 +3292,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -3370,6 +3369,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -3430,6 +3433,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3515,6 +3522,7 @@ def generate_report(
                 
                 all_requests.extend(report_requests)
 
+
                 # batchUpdate 분할 전송
                 if len(all_requests) >= 200:
                     sheet_svc.spreadsheets().batchUpdate(
@@ -3583,12 +3591,12 @@ def generate_report(
                         d["track_title"],
                         d["track_id"],
                         f"{year_val}년 {month_val}월",
-                        to_currency(fy_rv_val)
+                        fy_rv_val
                     ])
 
 
                 # 합계
-                fluxus_detail_matrix.append(["합계","","","","","", to_currency(total_det)])
+                fluxus_detail_matrix.append(["합계","","","","","", total_det])
                 row_cursor_fluxus_detail_end = len(fluxus_detail_matrix)
 
                 # 시트 업데이트
@@ -3773,6 +3781,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "RIGHT",
                                 "textFormat": {"bold": True}
                             }
@@ -3792,6 +3804,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "RIGHT"
                             }
                         },
@@ -3876,7 +3892,7 @@ def generate_report(
 
                 # 6) 정산율
                 rate_val = artist_cost_dict[artist]["정산요율"]
-                final_amount = apply_val * (rate_val / 100.0)
+                final_amount = round(apply_val * (rate_val / 100.0))
 
 
                 # --------------------------------------
@@ -3925,7 +3941,7 @@ def generate_report(
                         report_fluxus_matrix[row_cursor][1] = d["album"]       # 앨범명
                         report_fluxus_matrix[row_cursor][2] = d["track_title"] # 트랙제목
                         report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                        report_fluxus_matrix[row_cursor][5] = to_currency(rv)
+                        report_fluxus_matrix[row_cursor][5] = rv
                         row_cursor += 1
 
                     # [B] 트랙 모두 출력 뒤, "국내+해외 플랫폼 합계" 한 줄
@@ -3935,7 +3951,7 @@ def generate_report(
                     report_fluxus_matrix[row_cursor][1] = alb
                     report_fluxus_matrix[row_cursor][2] = f"국내, 해외 플랫폼({int(month_val)-1}월)"
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                    report_fluxus_matrix[row_cursor][5] = to_currency(fs_sum_for_this_album)
+                    report_fluxus_matrix[row_cursor][5] = fs_sum_for_this_album
                     row_cursor += 1
 
 
@@ -3945,7 +3961,7 @@ def generate_report(
                 row_cursor += 2
                 # 합계
                 report_fluxus_matrix[row_cursor-1][1] = "합계"
-                report_fluxus_matrix[row_cursor-1][5] = to_currency(fluxus_sum_all)
+                report_fluxus_matrix[row_cursor-1][5] = fluxus_sum_all
                 row_cursor_sum1 = row_cursor
                 row_cursor += 1
 
@@ -3969,21 +3985,21 @@ def generate_report(
                     # 1) 앨범 전체 매출(= 기존 로직)
                     report_fluxus_matrix[row_cursor][1] = alb
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                    report_fluxus_matrix[row_cursor][5] = to_currency(amt_total)
+                    report_fluxus_matrix[row_cursor][5] = amt_total
                     row_cursor += 1
                     
                     # 2) 국내, 해외 플랫폼(직전달)
                     report_fluxus_matrix[row_cursor][1] = alb
                     report_fluxus_matrix[row_cursor][2] = f"국내, 해외 플랫폼({int(month_val)-1}월)"
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                    report_fluxus_matrix[row_cursor][5] = to_currency(amt_song)
+                    report_fluxus_matrix[row_cursor][5] = amt_song
                     row_cursor += 1
 
                 end_album_data = row_cursor  # 데이터 마지막 +1
 
                 row_cursor += 1
                 report_fluxus_matrix[row_cursor-1][1] = "합계"
-                report_fluxus_matrix[row_cursor-1][5] = to_currency(fluxus_sum_all)
+                report_fluxus_matrix[row_cursor-1][5] = fluxus_sum_all
                 row_cursor_sum2 = row_cursor
                 row_cursor += 1
 
@@ -4010,13 +4026,13 @@ def generate_report(
 
                 report_fluxus_matrix[row_cursor][1] = alb_str
                 # (중요) 여기서 "곡비" = prev_val + curr_val
-                report_fluxus_matrix[row_cursor][2] = to_currency(song_cost_for_report)
+                report_fluxus_matrix[row_cursor][2] = song_cost_for_report
                 # 공제금액
-                report_fluxus_matrix[row_cursor][3] = to_currency(deduct_val)
+                report_fluxus_matrix[row_cursor][3] = deduct_val
                 # 공제 후 남은 곡비
-                report_fluxus_matrix[row_cursor][4] = to_currency(remain_val)
+                report_fluxus_matrix[row_cursor][4] = remain_val
                 # 공제 적용 금액 (매출 - 공제금액)
-                report_fluxus_matrix[row_cursor][5] = to_currency(fluxus_sum_all - deduct_val)
+                report_fluxus_matrix[row_cursor][5] = fluxus_sum_all - deduct_val
                 row_cursor += 2
                 row_cursor_sum3 = row_cursor
 
@@ -4036,11 +4052,11 @@ def generate_report(
                 report_fluxus_matrix[row_cursor][1] = alb_str
                 report_fluxus_matrix[row_cursor][2] = "수익 배분율"
                 report_fluxus_matrix[row_cursor][3] = f"{int(rate_val)}%"
-                report_fluxus_matrix[row_cursor][5] = to_currency(final_amount)
+                report_fluxus_matrix[row_cursor][5] = final_amount
                 row_cursor += 1
 
                 report_fluxus_matrix[row_cursor][1] = "총 정산금액"
-                report_fluxus_matrix[row_cursor][5] = to_currency(final_amount)
+                report_fluxus_matrix[row_cursor][5] = final_amount
                 row_cursor_sum4 = row_cursor
                 row_cursor += 2
 
@@ -4707,6 +4723,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -4860,6 +4880,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -4959,6 +4983,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5087,6 +5115,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -5111,6 +5143,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -5184,6 +5220,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
                                 "textFormat": {
@@ -5244,6 +5284,10 @@ def generate_report(
                         },
                         "cell": {
                             "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "#,##0"
+                                },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5364,100 +5408,6 @@ def generate_report(
     update_next_month_tab(song_cost_sh, ym)
     time.sleep(1)
 
-    # ===================================================================
-    # 마지막으로 시트명에서 UMAG_, FLUXUS_ 접두어 제거
-    # ===================================================================
-    all_sheets = out_sh.worksheets()
-    rename_requests = []
-    
-    for sheet in all_sheets:
-        current_title = sheet.title
-        if current_title.startswith("UMAG_") or current_title.startswith("FLUXUS_"):
-            # "UMAG_홍길동(정산서)" -> "홍길동(정산서)"
-            # "FLUXUS_홍길동(세부매출내역)" -> "홍길동(세부매출내역)"
-            new_title = current_title.replace("UMAG_", "").replace("FLUXUS_", "")
-            rename_requests.append({
-                "updateSheetProperties": {
-                    "properties": {
-                        "sheetId": sheet.id,
-                        "title": new_title
-                    },
-                    "fields": "title"
-                }
-            })
-    
-    # 한 번의 API 호출로 모든 시트 이름 변경
-    if rename_requests:
-        sheet_svc.spreadsheets().batchUpdate(
-            spreadsheetId=out_file_id,
-            body={"requests": rename_requests}
-        ).execute()
-        time.sleep(1)  # API 호출 제한 방지
-
-    # ===================================================================
-    # 모든 정산서 시트의 숫자를 통화 형식으로 변경
-    # ===================================================================
-    all_sheets = out_sh.worksheets()  # 시트 목록 다시 가져오기
-    for sheet in all_sheets:
-        if "(정산서)" in sheet.title:
-            # 시트 전체를 통화 형식으로 변경
-            sheet_svc.spreadsheets().batchUpdate(
-                spreadsheetId=out_file_id,
-                body={
-                    "requests": [{
-                        "repeatCell": {
-                            "range": {
-                                "sheetId": sheet.id,
-                                "startRowIndex": 0,
-                                "endRowIndex": 1000,  # 충분히 큰 값으로 설정
-                                "startColumnIndex": 0,
-                                "endColumnIndex": 7  # UMAG는 7열, FLUXUS는 6열이지만 초과해도 무방
-                            },
-                            "cell": {
-                                "userEnteredFormat": {
-                                    "numberFormat": {"type": "CURRENCY", "pattern": "₩#,##0"}
-                                }
-                            },
-                            "fields": "userEnteredFormat.numberFormat"
-                        }
-                    }]
-                }
-            ).execute()
-            time.sleep(1)  # API 호출 제한 방지
-
-    # ===================================================================
-    # 시트 순서 변경 - 정산서가 세부매출내역보다 앞에 오도록
-    # ===================================================================
-    all_sheets = out_sh.worksheets()  # 시트 목록 다시 가져오기
-    
-    # 시트를 정산서와 세부매출내역 쌍으로 정렬
-    sheet_pairs = {}  # {아티스트명: [정산서 시트, 세부매출내역 시트]}
-    for sheet in all_sheets:
-        title = sheet.title
-        if "(정산서)" in title:
-            artist = title.replace("(정산서)", "")
-            if artist not in sheet_pairs:
-                sheet_pairs[artist] = [None, None]
-            sheet_pairs[artist][0] = sheet
-        elif "(세부매출내역)" in title:
-            artist = title.replace("(세부매출내역)", "")
-            if artist not in sheet_pairs:
-                sheet_pairs[artist] = [None, None]
-            sheet_pairs[artist][1] = sheet
-
-    # 정렬된 시트 순서로 재배열
-    sorted_sheets = []
-    for artist in sorted(sheet_pairs.keys()):
-        if sheet_pairs[artist][0]:  # 정산서
-            sorted_sheets.append(sheet_pairs[artist][0])
-        if sheet_pairs[artist][1]:  # 세부매출내역
-            sorted_sheets.append(sheet_pairs[artist][1])
-
-    # 시트 순서 변경 적용
-    if sorted_sheets:
-        out_sh.reorder_worksheets(sorted_sheets)
-        time.sleep(1)  # API 호출 제한 방지
-
     # 최종 결과 반환
     return out_file_id
 
@@ -5466,19 +5416,20 @@ def generate_report(
 def main():
     st.title("아티스트 음원 정산 보고서 자동 생성기")
 
-    # 맨 앞단 - 곡비 파일 제작/수정 섹션
+    # 0) 곡비 파일 수정
     section_zero_prepare_song_cost()
     st.divider()
 
-    # 섹션 1: 보고서 생성
+    # 1) 보고서 생성
     section_one_report_input()
     st.divider()
 
-    # 섹션 2: 시트 링크 & 검증
+    # 2) 시트 링크 & 검증
     section_two_sheet_link_and_verification()
     st.divider()
 
-    # 섹션 3: 엑셀 업로드 후 시트분할 ZIP 다운로드
+    # 3) 엑셀 업로드 후 시트분할 ZIP 다운로드
+    # [주의] 3번을 독립적으로 실행하기 위해서는 아래 호출을 뺄 수도 있음
     section_three_upload_and_split_excel()
 
 
