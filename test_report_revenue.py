@@ -5368,22 +5368,39 @@ def generate_report(
     # 마지막으로 시트명에서 UMAG_, FLUXUS_ 접두어 제거
     # ===================================================================
     all_sheets = out_sh.worksheets()
+    rename_requests = []
+    
     for sheet in all_sheets:
         current_title = sheet.title
         if current_title.startswith("UMAG_") or current_title.startswith("FLUXUS_"):
             # "UMAG_홍길동(정산서)" -> "홍길동(정산서)"
             # "FLUXUS_홍길동(세부매출내역)" -> "홍길동(세부매출내역)"
             new_title = current_title.replace("UMAG_", "").replace("FLUXUS_", "")
-            sheet.update_title(new_title)
-            time.sleep(0.5)  # API 호출 제한 방지
+            rename_requests.append({
+                "updateSheetProperties": {
+                    "properties": {
+                        "sheetId": sheet.id,
+                        "title": new_title
+                    },
+                    "fields": "title"
+                }
+            })
+    
+    # 한 번의 API 호출로 모든 시트 이름 변경
+    if rename_requests:
+        sheet_svc.spreadsheets().batchUpdate(
+            spreadsheetId=out_file_id,
+            body={"requests": rename_requests}
+        ).execute()
+        time.sleep(1)  # API 호출 제한 방지
 
     # ===================================================================
-    # 모든 정산서 시트의 숫자 형식 변경
+    # 모든 정산서 시트의 숫자를 통화 형식으로 변경
     # ===================================================================
     all_sheets = out_sh.worksheets()  # 시트 목록 다시 가져오기
     for sheet in all_sheets:
         if "(정산서)" in sheet.title:
-            # 시트 전체를 숫자 형식으로 변경
+            # 시트 전체를 통화 형식으로 변경
             sheet_svc.spreadsheets().batchUpdate(
                 spreadsheetId=out_file_id,
                 body={
@@ -5398,7 +5415,7 @@ def generate_report(
                             },
                             "cell": {
                                 "userEnteredFormat": {
-                                    "numberFormat": {"type": "NUMBER", "pattern": "#,##0"}
+                                    "numberFormat": {"type": "CURRENCY", "pattern": "₩#,##0"}
                                 }
                             },
                             "fields": "userEnteredFormat.numberFormat"
