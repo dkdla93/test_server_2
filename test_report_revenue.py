@@ -1462,16 +1462,21 @@ def section_three_upload_and_split_excel():
             current_ym = st.session_state.get("ym", "000000")
             safe_artist = artist.replace("/", "_").replace("\\", "_")
             # 예: "홍길동_정산보고서_202501.xlsx"
-            filename_xlsx = f"{safe_artist}_정산보고서_{current_ym}.xlsx"
+            filename_xlsx = f"{safe_artist}_정산보고서.xlsx"
 
             zf.writestr(filename_xlsx, single_buf.getvalue())
 
     zip_buf.seek(0)
     progress_text.success("모든 아티스트 처리 완료! ZIP 다운로드 가능")
+
+    now_str = datetime.datetime.now().strftime("%Y%m%d")  # 예: '20250218'
+
+    zip_filename = f"report_revenue_{now_str}.zip"
+
     st.download_button(
         label="ZIP 다운로드",
         data=zip_buf.getvalue(),
-        file_name=f"report_revenue_{current_ym}.zip",
+        file_name=zip_filename,   # ★ 여기를 변경
         mime="application/zip"
     )
 
