@@ -1379,11 +1379,14 @@ def section_three_upload_and_split_excel():
     if uploaded_file is None:
         return
 
-    # 2) "아티스트별 XLSX 만들기" 버튼을 만듦
+    file_data = uploaded_file.read()
+ 
+    # "아티스트별 XLSX 파일 생성하기" 버튼
     if st.button("아티스트별 XLSX 파일 생성하기"):
-        # 여기에서 ZIP 생성
         try:
-            wb_all = openpyxl.load_workbook(io.BytesIO(uploaded_file.read()))
+            # 여기서도 uploaded_file.read()를 다시 하지 않고,
+            # 위에서 미리 읽은 file_data를 사용
+            wb_all = openpyxl.load_workbook(io.BytesIO(file_data))
         except Exception as e:
             st.error(f"엑셀 파일을 읽는 중 오류 발생: {e}")
             return
@@ -1391,14 +1394,6 @@ def section_three_upload_and_split_excel():
         # (3) 업로드된 엑셀 전체 로딩
         progress_bar = st.progress(0.0)
         progress_text = st.empty()
-
-        original_file_data = uploaded_file.read()
-        try:
-            # 전체 워크북 (구글시트에서 다운로드한 그대로)
-            wb_all = openpyxl.load_workbook(io.BytesIO(original_file_data))
-        except Exception as e:
-            st.error(f"엑셀 파일을 읽는 중 오류 발생: {e}")
-            return
 
         sheet_names = wb_all.sheetnames
         if not sheet_names:
@@ -1489,14 +1484,15 @@ def section_three_upload_and_split_excel():
             mime="application/zip"
         )
 
-    # 4) 만약 session_state에 zip 데이터가 있으면, download_button 표시
+    # 아래와 같은 session_state 로직이 있다면 필요에 따라 유지
     if "xlsx_zip_data" in st.session_state:
         st.download_button(
             label="ZIP 다운로드",
             data=st.session_state["xlsx_zip_data"],
-            file_name="report_revenue_20250218.zip",  # 날짜 등 원하는 값
+            file_name="report_revenue_20250218.zip",  
             mime="application/zip"
         )
+
 
 
 # ========== [4] 핵심 로직: generate_report =============
