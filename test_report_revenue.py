@@ -59,6 +59,26 @@ def get_credentials_from_secrets(which: str = "A") -> Credentials:
 # 검증(비교) 및 기타 헬퍼
 # ----------------------------------------------------------------
 
+def set_sheet_locale_to_korea(sheet_svc, spreadsheet_id: str):
+    # 1) locale을 ko_KR로 바꾸는 요청
+    requests = [
+        {
+            "updateSpreadsheetProperties": {
+                "properties": {
+                    "locale": "ko_KR"
+                },
+                "fields": "locale"
+            }
+        }
+    ]
+
+    # 2) batchUpdate 호출
+    sheet_svc.spreadsheets().batchUpdate(
+        spreadsheetId=spreadsheet_id,
+        body={"requests": requests}
+    ).execute()
+    print("스프레드시트 Locale을 ko_KR로 설정 완료")
+
 def open_sheet_with_retry(gc, sheet_name: str, max_attempts=3):
     for attempt in range(1, max_attempts+1):
         try:
@@ -1230,6 +1250,8 @@ def section_one_report_input():
         gc_a = gspread.authorize(creds_a)
         drive_svc_a = build("drive", "v3", credentials=creds_a)
         sheet_svc_a = build("sheets", "v4", credentials=creds_a)
+
+        set_sheet_locale_to_korea(sheet_svc_a, out_file_id)
 
         check_dict = {}
         out_file_id = generate_report(
