@@ -2061,9 +2061,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "RIGHT",
                                 "textFormat": {"bold": True}
@@ -2085,9 +2084,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "RIGHT"
                             }
@@ -2867,9 +2865,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3070,9 +3067,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3099,9 +3095,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3293,9 +3288,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3322,9 +3316,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3400,9 +3393,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3465,9 +3457,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -3814,9 +3805,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "RIGHT",
                                 "textFormat": {"bold": True}
@@ -3838,9 +3828,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "RIGHT"
                             }
@@ -4709,9 +4698,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -4787,9 +4775,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -4945,9 +4932,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5049,9 +5035,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -5182,9 +5167,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5211,9 +5195,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5289,9 +5272,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5354,9 +5336,8 @@ def generate_report(
                         "cell": {
                             "userEnteredFormat": {
                                 "numberFormat": {
-                                    "type": "CURRENCY",
-                                    "pattern": "#,##0",
-                                    "currencyCode": "KRW"
+                                    "type": "NUMBER",
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
