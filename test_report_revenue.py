@@ -1251,8 +1251,6 @@ def section_one_report_input():
         drive_svc_a = build("drive", "v3", credentials=creds_a)
         sheet_svc_a = build("sheets", "v4", credentials=creds_a)
 
-        set_sheet_locale_to_korea(sheet_svc_a, out_file_id)
-
         check_dict = {}
         out_file_id = generate_report(
             ym=ym,
@@ -1828,6 +1826,9 @@ def generate_report(
     # ------------------- (D) output_report_YYYYMM --------
     out_filename = f"ouput_report_{ym}"
     out_file_id = create_new_spreadsheet(out_filename, folder_id, drive_svc)
+
+    set_sheet_locale_to_korea(sheet_svc, out_file_id)
+
     out_sh = gc.open_by_key(out_file_id)
     
     # 기본생성 sheet1 삭제 시도
