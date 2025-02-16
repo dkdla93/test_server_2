@@ -1510,15 +1510,11 @@ def generate_report(
     artist_placeholder
 ):
     """
-    [요약]
-    1) input_song cost / input_online revenue 시트에서 해당 ym 데이터를 읽어옴
-    2) 아티스트별 매출 및 곡비(전월+당월 발생액, 당월차감 등) 정보를 합산
-    3) 구글 스프레드시트 형태의 'output_report_YYYYMM'을 생성하여
-       - 각 아티스트별 (1) 세부매출내역 탭, (2) 정산서 탭 생성
-       - '정산서' 탭 내 '3. 공제 내역' 칼럼 중 '곡비'를 (전월 잔액 + 당월 발생액)으로 표기
-    4) 최종 검증 정보를 check_dict에 누적
-    5) 작업 완료 후 out_file_id(생성된 구글시트 ID) 반환
+    실제 정산서 생성
     """
+    # 요청 리스트 초기화
+    report_requests = []
+    fluxus_report_requests = []
 
     folder_id = st.secrets["google_service_account_a"]["folder_id"]
 
