@@ -1896,11 +1896,11 @@ def generate_report(
                         d["middle"],
                         d["service"],
                         f"{year_val}년 {month_val}월",
-                        rv
+                        round(rv)
                     ])
 
                 # 합계
-                detail_matrix.append(["합계","","","","","", total_det])
+                detail_matrix.append(["합계","","","","","", round(total_det)])
                 row_cursor_detail_end = len(detail_matrix)
 
                 # 시트 업데이트
@@ -2039,7 +2039,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "RIGHT",
                                 "textFormat": {"bold": True}
@@ -2062,7 +2062,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "RIGHT"
                             }
@@ -2173,13 +2173,13 @@ def generate_report(
                     report_matrix[row_cursor][3] = d["middle"]
                     report_matrix[row_cursor][4] = d["service"]
                     report_matrix[row_cursor][5] = f"{year_val}년 {month_val}월"
-                    report_matrix[row_cursor][6] = rv
+                    report_matrix[row_cursor][6] = round(rv)
                     row_cursor += 1
 
                 row_cursor += 2
                 # 합계
                 report_matrix[row_cursor-1][1] = "합계"
-                report_matrix[row_cursor-1][6] = sum_1
+                report_matrix[row_cursor-1][6] = round(sum_1)
                 row_cursor_sum1 = row_cursor
                 row_cursor += 1
 
@@ -2197,14 +2197,14 @@ def generate_report(
 
                 for alb in sorted(album_sum.keys(), key=album_sort_key):
                     amt = album_sum[alb]
-                    report_matrix[row_cursor][1] = alb
+                    report_matrix[row_cursor][1] = round(alb)
                     report_matrix[row_cursor][5] = f"{year_val}년 {month_val}월"
-                    report_matrix[row_cursor][6] = amt
+                    report_matrix[row_cursor][6] = round(amt)
                     row_cursor += 1
 
                 row_cursor += 1
                 report_matrix[row_cursor-1][1] = "합계"
-                report_matrix[row_cursor-1][6] = sum_2
+                report_matrix[row_cursor-1][6] = round(sum_2)
                 row_cursor_sum2 = row_cursor
                 row_cursor += 1
 
@@ -2228,15 +2228,15 @@ def generate_report(
                 alb_list = sorted(album_sum.keys(), key=album_sort_key)
                 alb_str = ", ".join(alb_list) if alb_list else "(앨범 없음)"
 
-                report_matrix[row_cursor][1] = alb_str
+                report_matrix[row_cursor][1] = round(alb_str)
                 # (중요) 여기서 "곡비" = prev_val + curr_val
-                report_matrix[row_cursor][2] = song_cost_for_report
+                report_matrix[row_cursor][2] = round(song_cost_for_report)
                 # 공제금액
-                report_matrix[row_cursor][3] = deduct_val
+                report_matrix[row_cursor][3] = round(deduct_val)
                 # 공제 후 남은 곡비
-                report_matrix[row_cursor][5] = remain_val
+                report_matrix[row_cursor][5] = round(remain_val)
                 # 공제 적용 금액 (매출 - 공제금액)
-                report_matrix[row_cursor][6] = sum_2 - deduct_val
+                report_matrix[row_cursor][6] = round(sum_2 - deduct_val)
                 row_cursor += 2
                 row_cursor_sum3 = row_cursor
 
@@ -2253,14 +2253,14 @@ def generate_report(
                 report_matrix[row_cursor][6] = "적용 금액"
                 row_cursor += 1
 
-                report_matrix[row_cursor][1] = alb_str
+                report_matrix[row_cursor][1] = round(alb_str)
                 report_matrix[row_cursor][2] = "수익 배분율"
                 report_matrix[row_cursor][3] = f"{int(rate_val)}%"
-                report_matrix[row_cursor][6] = final_amount
+                report_matrix[row_cursor][6] = round(final_amount)
                 row_cursor += 1
 
                 report_matrix[row_cursor][1] = "총 정산금액"
-                report_matrix[row_cursor][6] = final_amount
+                report_matrix[row_cursor][6] = round(final_amount)
                 row_cursor_sum4 = row_cursor
                 row_cursor += 2
 
@@ -2843,7 +2843,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3045,7 +3045,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3073,7 +3073,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3266,7 +3266,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3294,7 +3294,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3371,7 +3371,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3435,7 +3435,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -3561,7 +3561,7 @@ def generate_report(
                         "track_title": track_title,
                         "track_number": "",
                         "track_id": "",
-                        "revenue": rv
+                        "revenue": round(rv)
                     })
 
                 # 2) 원래 Fluxus가 가져오던 매출
@@ -3591,12 +3591,12 @@ def generate_report(
                         d["track_title"],
                         d["track_id"],
                         f"{year_val}년 {month_val}월",
-                        fy_rv_val
+                        round(fy_rv_val)
                     ])
 
 
                 # 합계
-                fluxus_detail_matrix.append(["합계","","","","","", total_det])
+                fluxus_detail_matrix.append(["합계","","","","","", round(total_det)])
                 row_cursor_fluxus_detail_end = len(fluxus_detail_matrix)
 
                 # 시트 업데이트
@@ -3783,7 +3783,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "RIGHT",
                                 "textFormat": {"bold": True}
@@ -3806,7 +3806,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "RIGHT"
                             }
@@ -3941,17 +3941,17 @@ def generate_report(
                         report_fluxus_matrix[row_cursor][1] = d["album"]       # 앨범명
                         report_fluxus_matrix[row_cursor][2] = d["track_title"] # 트랙제목
                         report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                        report_fluxus_matrix[row_cursor][5] = rv
+                        report_fluxus_matrix[row_cursor][5] = round(rv)
                         row_cursor += 1
 
                     # [B] 트랙 모두 출력 뒤, "국내+해외 플랫폼 합계" 한 줄
                     fs_sum_for_this_album = fs_album_sum[alb]  # 위에서 만든 fs_album_sum 딕셔너리
 
                     # 한 줄 추가
-                    report_fluxus_matrix[row_cursor][1] = alb
+                    report_fluxus_matrix[row_cursor][1] = round(alb)
                     report_fluxus_matrix[row_cursor][2] = f"국내, 해외 플랫폼({int(month_val)-1}월)"
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                    report_fluxus_matrix[row_cursor][5] = fs_sum_for_this_album
+                    report_fluxus_matrix[row_cursor][5] = round(fs_sum_for_this_album)
                     row_cursor += 1
 
 
@@ -3961,7 +3961,7 @@ def generate_report(
                 row_cursor += 2
                 # 합계
                 report_fluxus_matrix[row_cursor-1][1] = "합계"
-                report_fluxus_matrix[row_cursor-1][5] = fluxus_sum_all
+                report_fluxus_matrix[row_cursor-1][5] = round(fluxus_sum_all)
                 row_cursor_sum1 = row_cursor
                 row_cursor += 1
 
@@ -3983,23 +3983,23 @@ def generate_report(
                     amt_song  = fs_album_sum.get(alb, 0)  # SONG만
 
                     # 1) 앨범 전체 매출(= 기존 로직)
-                    report_fluxus_matrix[row_cursor][1] = alb
+                    report_fluxus_matrix[row_cursor][1] = round(alb)
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                    report_fluxus_matrix[row_cursor][5] = amt_total
+                    report_fluxus_matrix[row_cursor][5] = round(amt_total)
                     row_cursor += 1
                     
                     # 2) 국내, 해외 플랫폼(직전달)
-                    report_fluxus_matrix[row_cursor][1] = alb
+                    report_fluxus_matrix[row_cursor][1] = round(alb)
                     report_fluxus_matrix[row_cursor][2] = f"국내, 해외 플랫폼({int(month_val)-1}월)"
                     report_fluxus_matrix[row_cursor][4] = f"{year_val}년 {month_val}월"
-                    report_fluxus_matrix[row_cursor][5] = amt_song
+                    report_fluxus_matrix[row_cursor][5] = round(amt_song)
                     row_cursor += 1
 
                 end_album_data = row_cursor  # 데이터 마지막 +1
 
                 row_cursor += 1
                 report_fluxus_matrix[row_cursor-1][1] = "합계"
-                report_fluxus_matrix[row_cursor-1][5] = fluxus_sum_all
+                report_fluxus_matrix[row_cursor-1][5] = round(fluxus_sum_all)
                 row_cursor_sum2 = row_cursor
                 row_cursor += 1
 
@@ -4024,15 +4024,15 @@ def generate_report(
                 alb_list = sorted(fluxus_album_sum.keys(), key=album_sort_key)
                 alb_str = ", ".join(alb_list) if alb_list else "(앨범 없음)"
 
-                report_fluxus_matrix[row_cursor][1] = alb_str
+                report_fluxus_matrix[row_cursor][1] = round(alb_str)
                 # (중요) 여기서 "곡비" = prev_val + curr_val
-                report_fluxus_matrix[row_cursor][2] = song_cost_for_report
+                report_fluxus_matrix[row_cursor][2] = round(song_cost_for_report)
                 # 공제금액
-                report_fluxus_matrix[row_cursor][3] = deduct_val
+                report_fluxus_matrix[row_cursor][3] = round(deduct_val)
                 # 공제 후 남은 곡비
-                report_fluxus_matrix[row_cursor][4] = remain_val
+                report_fluxus_matrix[row_cursor][4] = round(remain_val)
                 # 공제 적용 금액 (매출 - 공제금액)
-                report_fluxus_matrix[row_cursor][5] = fluxus_sum_all - deduct_val
+                report_fluxus_matrix[row_cursor][5] = round(fluxus_sum_all - deduct_val)
                 row_cursor += 2
                 row_cursor_sum3 = row_cursor
 
@@ -4049,14 +4049,14 @@ def generate_report(
                 report_fluxus_matrix[row_cursor][5] = "적용 금액"
                 row_cursor += 1
 
-                report_fluxus_matrix[row_cursor][1] = alb_str
+                report_fluxus_matrix[row_cursor][1] = round(alb_str)
                 report_fluxus_matrix[row_cursor][2] = "수익 배분율"
                 report_fluxus_matrix[row_cursor][3] = f"{int(rate_val)}%"
-                report_fluxus_matrix[row_cursor][5] = final_amount
+                report_fluxus_matrix[row_cursor][5] = round(final_amount)
                 row_cursor += 1
 
                 report_fluxus_matrix[row_cursor][1] = "총 정산금액"
-                report_fluxus_matrix[row_cursor][5] = final_amount
+                report_fluxus_matrix[row_cursor][5] = round(final_amount)
                 row_cursor_sum4 = row_cursor
                 row_cursor += 2
 
@@ -4662,6 +4662,34 @@ def generate_report(
                         "fields": "userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
+                # (J-2-2) "음원 서비스별" 정산내역 표 본문
+                report_fluxus_requests.append({
+                    "repeatCell": {
+                        "range": {
+                            "sheetId": ws_fluxus_report_id,
+                            "startRowIndex": 14,
+                            "endRowIndex": row_cursor_sum1,
+                            "startColumnIndex": 6,
+                            "endColumnIndex": 7
+                        },
+                        "cell": {
+                            "userEnteredFormat": {
+                                "numberFormat": {
+                                    "type": "CURRENCY",
+                                    "pattern": "\"₩\"#,##0"
+                                },
+                                "horizontalAlignment": "CENTER",
+                                "verticalAlignment": "MIDDLE",
+                                "textFormat": {
+                                    "fontFamily": "Malgun Gothic",
+                                    "fontSize": 10,
+                                    "bold": False
+                                }
+                            }
+                        },
+                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                    }
+                })
                 # (J-3) 합계행 전 병합
                 report_fluxus_requests.append({
                     "mergeCells": {
@@ -4725,7 +4753,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -4882,7 +4910,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -4985,7 +5013,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -5117,7 +5145,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5145,7 +5173,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5222,7 +5250,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5286,7 +5314,7 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "#,##0"
+                                    "pattern": "\"₩\"#,##0"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
