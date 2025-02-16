@@ -2068,7 +2068,7 @@ def generate_report(
                                 "textFormat": {"bold": True}
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,textFormat)"
                     }
                 })
                 # 매출 순수익 칼럼 (F열=idx=6) 나머지 행들
@@ -2090,7 +2090,7 @@ def generate_report(
                                 "horizontalAlignment": "RIGHT"
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment)"
                     }
                 })
 
@@ -2877,7 +2877,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (J-3) 합계행 전 병합
@@ -3079,7 +3079,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (K-4) 앨범별 정산내역 합계행
@@ -3107,7 +3107,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (K-5) 합계행 병합
@@ -3300,7 +3300,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (L-4) 공제 내역 표 본문 (합계 부분)
@@ -3328,7 +3328,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
 
@@ -3405,7 +3405,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (M-4) 수익 배분 표 합계행 병합
@@ -3470,7 +3470,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
 
@@ -3812,7 +3812,7 @@ def generate_report(
                                 "textFormat": {"bold": True}
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,textFormat)"
                     }
                 })
                 # 매출 순수익 칼럼 (F열=idx=6) 나머지 행들
@@ -3834,7 +3834,7 @@ def generate_report(
                                 "horizontalAlignment": "RIGHT"
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment)"
                     }
                 })
 
@@ -4710,7 +4710,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (J-3) 합계행 전 병합
@@ -4788,7 +4788,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (J-5) 표에 Banding (줄무늬 효과)
@@ -4944,7 +4944,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (K-3_2) 병합 요청 누적
@@ -5048,7 +5048,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
 
@@ -5179,7 +5179,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (L-4) 공제 내역 표 본문 (합계 부분)
@@ -5207,7 +5207,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
 
@@ -5284,7 +5284,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
                 # (M-4) 수익 배분 표 합계행 병합
@@ -5349,7 +5349,7 @@ def generate_report(
                                 }
                             }
                         },
-                        "fields": "userEnteredFormat(backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
+                        "fields": "userEnteredFormat(numberFormat,backgroundColor,horizontalAlignment,verticalAlignment,textFormat)"
                     }
                 })
 
