@@ -1450,7 +1450,7 @@ def section_three_upload_and_split_excel():
                     continue
 
                 # (A) 원본 워크북 복사
-                temp_wb = openpyxl.load_workbook(io.BytesIO(original_file_data))
+                temp_wb = openpyxl.load_workbook(io.BytesIO(file_data))
 
                 # (B) 필요 시트(keep_sheets)만 남기고 전부 제거
                 for sname in temp_wb.sheetnames:
@@ -1489,7 +1489,7 @@ def section_three_upload_and_split_excel():
         st.download_button(
             label="ZIP 다운로드",
             data=st.session_state["xlsx_zip_data"],
-            file_name="report_revenue_20250218.zip",  
+            file_name=zip_filename,  
             mime="application/zip"
         )
 
