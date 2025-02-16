@@ -491,7 +491,8 @@ def album_sort_key(album_name: str):
     return (0 if is_korean_string(album_name) else 1, album_name)
 
 def to_currency(num):
-    return f"₩{format(int(round(num)), ',')}"
+    # 반올림 처리로 변경하고 숫자 그대로 반환
+    return str(round(num))
 
 def update_next_month_tab(song_cost_sh, ym: str):
     """
@@ -895,7 +896,7 @@ def section_zero_prepare_song_cost():
             sum_flux_yt_dict[a_fy] += val_fy
 
         # ---------------------------------------
-        # [중요] 2개 이상 소속도 “모두” 매출 더해서 actual_deduct 산출
+        # [중요] 2개 이상 소속도 "모두" 매출 더해서 actual_deduct 산출
         # ---------------------------------------
         updated_vals_for_def = []
 
@@ -1150,7 +1151,7 @@ def section_zero_prepare_song_cost():
                 st.error("원본 vs 처리 결과에 차이가 있습니다. 상세탭에서 상세 누락 행을 확인해 주세요.")
 
         with tab_missing:
-            # 여기에서 UMAG / Fluxus Song / Fluxus YT ‘missing_rows’ 표
+            # 여기에서 UMAG / Fluxus Song / Fluxus YT 'missing_rows' 표
             if diff_umag_row!=0 or diff_flux_song!=0 or diff_flux_yt!=0:
                 st.warning(f"매출 데이터 행개수 차이 발생!")
                 st.warning(f"UMAG: {diff_umag_row}개    /   FLUXUS_SONG: {diff_flux_song}개    /   FLUXUS_YT: {diff_flux_yt}개")
@@ -1333,15 +1334,10 @@ def section_two_sheet_link_and_verification():
 def section_three_upload_and_split_excel():
     """
     1) 보고서 구글시트에서 '파일→다운로드→Microsoft Excel(.xlsx)'로 받은 파일을 업로드
-    2) 업로드된 전체 워크북에서, 각 아티스트별 ‘정산서‘ 탭 + ‘세부매출내역’ 탭만 남기고
+    2) 업로드된 전체 워크북에서, 각 아티스트별 '정산서' 탭 + '세부매출내역' 탭만 남기고
        나머지 시트를 제거한 뒤, 해당 워크북을 ZIP으로 묶어 다운로드.
     3) 이 방식으로 하면 구글시트에서 이미 적용된 서식이 그대로 보존됩니다.
     """
-    # (1) report_done 여부 확인
-    if "report_done" not in st.session_state or not st.session_state["report_done"]:
-        st.info("정산 보고서가 먼저 생성된 뒤에, 엑셀 업로드 가능합니다.")
-        return
-
     st.subheader("3) 엑셀 업로드 후, [아티스트별] XLSX (정산서+세부매출내역) 생성")
 
     # 가이드를 접을 수 있게 만듭니다.
@@ -1349,9 +1345,13 @@ def section_three_upload_and_split_excel():
         st.markdown(
             """
             [사용안내]
-            1. 생성된 구글시트 파일을 '엑셀(.xlsx)'로 다운로드 받습니다.
+            1. 구글시트 파일을 '엑셀(.xlsx)'로 다운로드 받습니다.
+               - 파일 → 다운로드 → Microsoft Excel (.xlsx)
             2. 본 파일을 업로드하면, 아티스트별로 정산서/세부매출내역 탭만 포함된 엑셀 파일이 생성됩니다.
             3. 생성된 엑셀을 하나로 묶은 ZIP 파일을 다운로드하면, 아티스트별 보고서를 개별 확인할 수 있습니다.
+
+            * 이 기능은 다른 섹션과 독립적으로 실행할 수 있습니다.
+            * 정산서와 세부매출내역 탭이 포함된 엑셀 파일이라면 언제든 사용 가능합니다.
             """
         )
 
@@ -1377,7 +1377,7 @@ def section_three_upload_and_split_excel():
         st.warning("업로드된 엑셀 파일에 시트가 없습니다.")
         return
 
-    # (4) “어떤 아티스트”에 해당하는 탭들이 있는지 찾기
+    # (4) "어떤 아티스트"에 해당하는 탭들이 있는지 찾기
     #     예: 'UMAG_홍길동(정산서)', 'UMAG_홍길동(세부매출내역)' 형태라고 가정
     from collections import defaultdict
     all_artists_sheets = defaultdict(
@@ -2265,6 +2265,60 @@ def generate_report(
                 # 시트에 실제 업로드
                 ws_report.update(range_name="A1", values=report_matrix)
                 time.sleep(1)
+
+                # 숫자 형식으로 변경할 범위들 정의
+                number_format_ranges = [
+                    # 1. 음원 서비스별 정산내역 - 매출액
+                    {"startRow": header_row_1 + 1, "endRow": row_cursor_sum1 - 1, "col": 6},
+                    # 2. 앨범별 정산내역 - 매출액
+                    {"startRow": row_cursor_album + 1, "endRow": row_cursor_sum2 - 1, "col": 6},
+                    # 3. 공제 내역 - 곡비, 공제금액, 공제후잔액, 공제적용금액
+                    {"startRow": row_cursor_deduction + 1, "endRow": row_cursor_sum3 - 2, "cols": [2,3,5,6]},
+                    # 4. 수익 배분 - 적용금액
+                    {"startRow": row_cursor_rate + 1, "endRow": row_cursor_sum4, "col": 6}
+                ]
+
+                # 숫자 형식 변경 요청 추가
+                for range_info in number_format_ranges:
+                    if "col" in range_info:
+                        # 단일 열인 경우
+                        report_requests.append({
+                            "repeatCell": {
+                                "range": {
+                                    "sheetId": ws_report_id,
+                                    "startRowIndex": range_info["startRow"] - 1,
+                                    "endRowIndex": range_info["endRow"],
+                                    "startColumnIndex": range_info["col"] - 1,
+                                    "endColumnIndex": range_info["col"]
+                                },
+                                "cell": {
+                                    "userEnteredFormat": {
+                                        "numberFormat": {"type": "NUMBER", "pattern": "#,##0"}
+                                    }
+                                },
+                                "fields": "userEnteredFormat.numberFormat"
+                            }
+                        })
+                    else:
+                        # 여러 열인 경우
+                        for col in range_info["cols"]:
+                            report_requests.append({
+                                "repeatCell": {
+                                    "range": {
+                                        "sheetId": ws_report_id,
+                                        "startRowIndex": range_info["startRow"] - 1,
+                                        "endRowIndex": range_info["endRow"],
+                                        "startColumnIndex": col - 1,
+                                        "endColumnIndex": col
+                                    },
+                                    "cell": {
+                                        "userEnteredFormat": {
+                                            "numberFormat": {"type": "NUMBER", "pattern": "#,##0"}
+                                        }
+                                    },
+                                    "fields": "userEnteredFormat.numberFormat"
+                                }
+                            })
 
                 # ------------------------------------
                 # (검증) check_dict에 비교결과 반영
@@ -3464,7 +3518,6 @@ def generate_report(
                 })
                 
                 all_requests.extend(report_requests)
-
 
                 # batchUpdate 분할 전송
                 if len(all_requests) >= 200:
@@ -5314,6 +5367,83 @@ def generate_report(
     # ----------------------
     update_next_month_tab(song_cost_sh, ym)
     time.sleep(1)
+
+    # ===================================================================
+    # 마지막으로 시트명에서 UMAG_, FLUXUS_ 접두어 제거
+    # ===================================================================
+    all_sheets = out_sh.worksheets()
+    for sheet in all_sheets:
+        current_title = sheet.title
+        if current_title.startswith("UMAG_") or current_title.startswith("FLUXUS_"):
+            # "UMAG_홍길동(정산서)" -> "홍길동(정산서)"
+            # "FLUXUS_홍길동(세부매출내역)" -> "홍길동(세부매출내역)"
+            new_title = current_title.replace("UMAG_", "").replace("FLUXUS_", "")
+            sheet.update_title(new_title)
+            time.sleep(0.5)  # API 호출 제한 방지
+
+    # ===================================================================
+    # 모든 정산서 시트의 숫자 형식 변경
+    # ===================================================================
+    all_sheets = out_sh.worksheets()  # 시트 목록 다시 가져오기
+    for sheet in all_sheets:
+        if "(정산서)" in sheet.title:
+            # 시트 전체를 숫자 형식으로 변경
+            sheet_svc.spreadsheets().batchUpdate(
+                spreadsheetId=out_file_id,
+                body={
+                    "requests": [{
+                        "repeatCell": {
+                            "range": {
+                                "sheetId": sheet.id,
+                                "startRowIndex": 0,
+                                "endRowIndex": 1000,  # 충분히 큰 값으로 설정
+                                "startColumnIndex": 0,
+                                "endColumnIndex": 7  # UMAG는 7열, FLUXUS는 6열이지만 초과해도 무방
+                            },
+                            "cell": {
+                                "userEnteredFormat": {
+                                    "numberFormat": {"type": "NUMBER", "pattern": "#,##0"}
+                                }
+                            },
+                            "fields": "userEnteredFormat.numberFormat"
+                        }
+                    }]
+                }
+            ).execute()
+            time.sleep(1)  # API 호출 제한 방지
+
+    # ===================================================================
+    # 시트 순서 변경 - 정산서가 세부매출내역보다 앞에 오도록
+    # ===================================================================
+    all_sheets = out_sh.worksheets()  # 시트 목록 다시 가져오기
+    
+    # 시트를 정산서와 세부매출내역 쌍으로 정렬
+    sheet_pairs = {}  # {아티스트명: [정산서 시트, 세부매출내역 시트]}
+    for sheet in all_sheets:
+        title = sheet.title
+        if "(정산서)" in title:
+            artist = title.replace("(정산서)", "")
+            if artist not in sheet_pairs:
+                sheet_pairs[artist] = [None, None]
+            sheet_pairs[artist][0] = sheet
+        elif "(세부매출내역)" in title:
+            artist = title.replace("(세부매출내역)", "")
+            if artist not in sheet_pairs:
+                sheet_pairs[artist] = [None, None]
+            sheet_pairs[artist][1] = sheet
+
+    # 정렬된 시트 순서로 재배열
+    sorted_sheets = []
+    for artist in sorted(sheet_pairs.keys()):
+        if sheet_pairs[artist][0]:  # 정산서
+            sorted_sheets.append(sheet_pairs[artist][0])
+        if sheet_pairs[artist][1]:  # 세부매출내역
+            sorted_sheets.append(sheet_pairs[artist][1])
+
+    # 시트 순서 변경 적용
+    if sorted_sheets:
+        out_sh.reorder_worksheets(sorted_sheets)
+        time.sleep(1)  # API 호출 제한 방지
 
     # 최종 결과 반환
     return out_file_id
