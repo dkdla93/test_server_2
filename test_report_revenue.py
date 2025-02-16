@@ -1360,6 +1360,9 @@ def section_three_upload_and_split_excel():
 
     st.subheader("3) 엑셀 업로드 후, [아티스트별] XLSX (정산서+세부매출내역) 생성")
 
+    current_ym = st.session_state.get("ym", "000000")
+
+
     # 가이드를 접을 수 있게 만듭니다.
     with st.expander("사용자 가이드"):
         st.markdown(
