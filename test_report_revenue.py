@@ -2062,7 +2062,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "RIGHT",
                                 "textFormat": {"bold": True}
@@ -2085,7 +2086,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "RIGHT"
                             }
@@ -2866,7 +2868,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3068,7 +3071,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3096,7 +3100,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3289,7 +3294,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3317,7 +3323,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3394,7 +3401,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -3458,7 +3466,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -3806,7 +3815,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "RIGHT",
                                 "textFormat": {"bold": True}
@@ -3829,7 +3839,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "RIGHT"
                             }
@@ -4699,7 +4710,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -4776,7 +4788,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -4933,7 +4946,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5036,7 +5050,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
@@ -5168,7 +5183,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5196,7 +5212,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5273,7 +5290,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "horizontalAlignment": "CENTER",
                                 "verticalAlignment": "MIDDLE",
@@ -5337,7 +5355,8 @@ def generate_report(
                             "userEnteredFormat": {
                                 "numberFormat": {
                                     "type": "CURRENCY",
-                                    "pattern": "\"₩\"#,##0"
+                                    "pattern": "#,##0",
+                                    "currencyCode": "KRW"
                                 },
                                 "backgroundColor": {"red": 0.896, "green": 0.988, "blue": 1},
                                 "horizontalAlignment": "CENTER",
